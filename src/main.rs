@@ -10,13 +10,13 @@ use std::process::exit;
 use std::str::FromStr;
 
 use anyhow::Context;
+use console::{colors_enabled_stderr, set_colors_enabled};
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 use sha2::Digest;
 use structopt::StructOpt;
 
 use crate::progress::{new_progress_bar, ProgressTrackable};
-use console::{colors_enabled_stderr, set_colors_enabled};
 
 mod progress;
 
@@ -241,23 +241,21 @@ fn determine_version(
     project_data: &ProjectData,
     version: &String,
 ) -> Result<String, anyhow::Error> {
-    if project_data.versions.contains(&version) {
-        return Ok(version.clone());
-    }
     if project_data.version_groups.contains(&version) {
         let group_data: VersionGroupData = do_get_json(format!(
             "{}/projects/{}/version_group/{}",
             PAPER_BASE, project_data.project_id, version
         ))
         .expect("Failed to get version group data");
-        group_data
-            .versions
-            .into_iter()
-            .last()
-            .ok_or_else(|| anyhow::anyhow!("The version group does not have any versions"))
+        if let Some(g) = group_data.versions.into_iter().last() {
+            return Ok(g);
+        }
+    }
+    if project_data.versions.contains(&version) {
+        Ok(version.clone())
     } else {
         Err(anyhow::anyhow!(
-            "{} is not a known version or version group",
+            "{} is not a known version or (part of a) version group",
             version
         ))
     }
