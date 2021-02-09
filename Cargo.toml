@@ -1,0 +1,28 @@
+[package]
+name = "paper-latest"
+description = "Downloads the latest build from PaperMC"
+keywords = ["papermc"]
+categories = ["command-line-utilities"]
+version = "0.1.0"
+authors = ["Octavia Togami <octavia.togami@gmail.com>"]
+edition = "2018"
+license = "GPL-3.0-or-later"
+readme = "README.md"
+repository = "https://github.com/octylFractal/paper-latest"
+
+[dependencies]
+structopt = "0.3.21"
+anyhow = "1.0.38"
+sha2 = "0.9.3"
+hex = "0.4.2"
+console = "0.14.0"
+indicatif = "0.15.0"
+
+[dependencies.serde]
+version = "1.0.123"
+features = ["derive"]
+
+[dependencies.attohttpc]
+version = "0.16.1"
+default-features = false
+features = ["json", "tls"]
