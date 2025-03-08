@@ -10,6 +10,7 @@ pub fn new_progress_bar(bar_length: Option<u64>) -> ProgressBar {
     .template(
         "{percent:>3}%[{bar:60.cyan/blue}] {bytes:>7}/{total_bytes:7} {bytes_per_sec} {wide_msg}",
     )
+    .expect("template should be correct")
     .progress_chars("#|-");
 
     let bar = ProgressBar::new(bar_length.unwrap_or(!0)).with_style(bar_style);
@@ -29,12 +30,12 @@ impl<R: Read> Read for ProgressTrackingRead<R> {
             Ok(v) => v,
             Err(e) => {
                 self.bar
-                    .abandon_with_message(&*format!("Failed to download: {}", e));
+                    .abandon_with_message(format!("Failed to download: {}", e));
                 return Err(e);
             }
         };
         self.bar.inc(amt as u64);
-        return Ok(amt);
+        Ok(amt)
     }
 }
 

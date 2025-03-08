@@ -50,7 +50,7 @@ impl DownloadLocation {
     fn writer(&self) -> Result<Box<dyn Write>, anyhow::Error> {
         Ok(match self {
             DownloadLocation::Stdout => Box::new(stdout()),
-            DownloadLocation::File(path) => Box::new(std::fs::File::create(path)?),
+            DownloadLocation::File(path) => Box::new(File::create(path)?),
         })
     }
 }
@@ -75,7 +75,7 @@ impl Display for DownloadLocation {
     }
 }
 
-const PAPER_BASE: &str = "https://papermc.io/api/v2";
+const PAPER_BASE: &str = "https://api.papermc.io/v2";
 
 fn main() {
     // hacky af, but we know we don't print color to STDOUT here
@@ -231,7 +231,7 @@ fn check_mem_hash(download_hash: &Vec<u8>, bytes: &Vec<u8>) {
     if !is_good {
         panic!(
             "Failed digest check, given {}, got {}",
-            hex::encode(&download_hash),
+            hex::encode(download_hash),
             hex::encode(&memory_hash)
         );
     }
@@ -241,7 +241,7 @@ fn determine_version(
     project_data: &ProjectData,
     version: &String,
 ) -> Result<String, anyhow::Error> {
-    if project_data.version_groups.contains(&version) {
+    if project_data.version_groups.contains(version) {
         let group_data: VersionGroupData = do_get_json(format!(
             "{}/projects/{}/version_group/{}",
             PAPER_BASE, project_data.project_id, version
@@ -251,7 +251,7 @@ fn determine_version(
             return Ok(g);
         }
     }
-    if project_data.versions.contains(&version) {
+    if project_data.versions.contains(version) {
         Ok(version.clone())
     } else {
         Err(anyhow::anyhow!(
